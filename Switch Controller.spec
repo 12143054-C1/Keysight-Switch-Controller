@@ -2,11 +2,11 @@
 
 
 a = Analysis(
-    ['c1sc.py'],
+    ['c1sc_tkinter.py'],
     pathex=[],
     binaries=[],
-    datas=[('Keysight-Logo.png', '.'), ('switch_connector_name_dict.py', '.'), ('manual_switch_control.py', '.')],
-    hiddenimports=['kivy', 'kivy.core', 'kivy.uix', 'kivy.graphics', 'kivy_deps.angle', 'kivy_deps.glew', 'kivy_deps.sdl2', 'enchant'],
+    datas=[('remote-control.ico', '.')],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -21,7 +21,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='SwitchApp',
+    name='Switch Controller',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -34,4 +34,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['remote-control.ico'],
 )
