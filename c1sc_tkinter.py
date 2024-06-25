@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import math, os, sys, pickle
+import math, os, sys, pickle, tempfile
 
 from manual_switch_control import Switch_Class
 sc = Switch_Class()
@@ -212,7 +212,7 @@ class CircleGenerator(tk.Tk):
 
     def load_ip_history(self):
         try:
-            with open('ip_history.pkl', 'rb') as f:
+            with open(os.path.join(tempfile.gettempdir(), 'ip_history.pkl'), 'rb') as f:
                 ip_history = pickle.load(f)
                 self.ip_combobox['values'] = ip_history
                 if ip_history:
@@ -225,7 +225,7 @@ class CircleGenerator(tk.Tk):
         if ip_address in ip_history:
             ip_history.remove(ip_address)
         ip_history.insert(0, ip_address)
-        with open('ip_history.pkl', 'wb') as f:
+        with open(os.path.join(tempfile.gettempdir(), 'ip_history.pkl'), 'wb') as f:
             pickle.dump(ip_history, f)
         self.ip_combobox['values'] = ip_history
 
