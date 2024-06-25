@@ -1,6 +1,20 @@
 class Switch_Connector_Name_Dict():
     def __init__(self):
         self.switch_connector_name_dict = {
+            'g_0'   : 'SW7',
+            'g_6'   : 'SW4',
+            'g_12'  : 'SW3',
+            'g_18'  : 'SW2',
+            'g_24'  : 'SW1',
+            'g_30'  : 'SW6',
+            'g_36'  : 'SW5',
+            'g_42'  : 'SW14',
+            'g_48'  : 'SW11',
+            'g_54'  : 'SW10',
+            'g_60'  : 'SW9',
+            'g_66'  : 'SW8',
+            'g_72'  : 'SW13',
+            'g_78'  : 'SW12',
             '1_mid' : '1321',
             '2_mid' : '1331',
             '3_mid' : '1301',

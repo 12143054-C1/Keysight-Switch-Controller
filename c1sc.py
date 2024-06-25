@@ -1,19 +1,25 @@
 from kivy.config import Config
 # Disable resizing the window
 Config.set('graphics', 'resizable', False)
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.graphics import Ellipse, Color, Rectangle
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
 from kivy.uix.image import Image  # Import Image widget
 from kivy.core.window import Window
 from math import sin, cos, pi
 from switch_connector_name_dict import Switch_Connector_Name_Dict
+from manual_switch_control import Switch_Class
 
 switch_connector_name_dict = Switch_Connector_Name_Dict()
 switch_connector_name_dict = switch_connector_name_dict.switch_connector_name_dict
+
+switch_api = Switch_Class()
 
 class CircleGroup(Widget):
     ellipse_count = 0  # Class-level variable to keep track of ellipses
@@ -41,6 +47,23 @@ class CircleGroup(Widget):
             x = self.center_x - radius
             y = self.center_y - radius
             ellipse = Ellipse(pos=(x, y), size=(2 * radius, 2 * radius))
+            big_ellipse_name = switch_connector_name_dict[f"g_{CircleGroup.ellipse_count}"]
+            # Add label for the ellipse name
+            label_x = x - 33
+            label_y = y + 110
+            label = Label(
+                color='black',
+                text=big_ellipse_name,
+                pos=(label_x, label_y),
+                size_hint=(None, None),
+                size=(100, 30),
+                halign='center',
+                valign='middle',
+                font_name='Roboto-Bold'  # Make the text bold
+            )
+
+            self.add_widget(label)
+
 
             label_distance = 45  # Distance from the ellipse center to the label
             for i in range(6):
@@ -87,11 +110,12 @@ class CircleGroup(Widget):
             self.reset_ellipse_color(self.selected_ellipse)
         self.set_ellipse_color(name)
         self.selected_ellipse = name
+        print(name)
 
     def set_ellipse_color(self, name):
         ellipse_data = self.ellipses[name]
         ellipse = ellipse_data['ellipse']
-        self.canvas.add(Color(0, 1, 0, 1))  # Set the color to green
+        self.canvas.add(Color(1, 0, 0, 1))  # Set the color
         self.canvas.add(Ellipse(pos=ellipse_data['pos'], size=ellipse_data['size']))
 
     def reset_ellipse_color(self, name):
@@ -162,11 +186,12 @@ class ThreeCircles(Widget):
             self.reset_ellipse_color(self.selected_ellipse)
         self.set_ellipse_color(name)
         self.selected_ellipse = name
+        print(name)
 
     def set_ellipse_color(self, name):
         ellipse_data = self.ellipses[name]
         ellipse = ellipse_data['ellipse']
-        self.canvas.add(Color(0, 1, 0, 1))  # Set the color to green
+        self.canvas.add(Color(1, 0, 0, 1))  # Set the color 
         self.canvas.add(Ellipse(pos=ellipse_data['pos'], size=ellipse_data['size']))
 
     def reset_ellipse_color(self, name):
@@ -210,6 +235,9 @@ class SwitchApp(App):
 
         self.add_group_sets()
         self.add_middle_circles()
+
+        # Add the IP entry box, connect button, and indicator light
+        self.add_connection_widgets()
 
         #Window.bind(on_resize=self.on_window_resize)
 
@@ -256,6 +284,48 @@ class SwitchApp(App):
         # Add the second set of 3 circles
         three_circles_2 = ThreeCircles(center_x, center_y - 230, self.circle_radius, 50)
         self.layout.add_widget(three_circles_2)
+
+    def add_connection_widgets(self):
+        self.ip_input = TextInput(
+            hint_text="Enter IP address",
+            size_hint=(None, None),
+            size=(200, 30),
+            pos=(10, 10)
+        )
+
+        self.connect_button = Button(
+            text="Connect",
+            size_hint=(None, None),
+            size=(100, 30),
+            pos=(220, 10)
+        )
+        self.connect_button.bind(on_press=self.connect_to_switch)
+
+        with self.layout.canvas:
+            self.indicator_color = Color(0.5, 0.5, 0.5, 1)  # Grey color for the indicator light
+            self.indicator = Ellipse(pos=(330, 14), size=(20, 20))
+
+        self.layout.add_widget(self.ip_input)
+        self.layout.add_widget(self.connect_button)
+
+    def connect_to_switch(self, instance):
+        self.update_indicator_color((.5, .5, .5, 1))
+        ip_address = self.ip_input.text
+        if self.validate_ip(ip_address):
+            self.update_indicator_color((0, 1, 0, 1))  # Green color for connected
+            print("IP OK")
+        else:
+            self.update_indicator_color((1, 0, 0, 1))  # Red color for error
+            print("Connection Failed")
+
+    def update_indicator_color(self, color):
+        self.indicator_color.rgba = color  # Update the color directly
+
+    def validate_ip(self, ip):
+        if switch_api.connect(ip):
+            return True
+        else:
+            return False
 
     def on_window_resize(self, *args):
         self.update_logo_position()

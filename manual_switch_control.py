@@ -1,12 +1,14 @@
 import AgilentSwitchL8990D001 as switch
 
 class Switch_Class():
-    def __init__(self, ip="") -> None:
-        if ip == "":
-            print("No Switch IP provided!")
-        else:
+    def connect(self, ip=""):
+        try:
             self.switch_obj = switch.fnConnect(ip)
-            #self.switch_obj.timeout = 5000  # Set timeout to 5 seconds
+            return True
+        except:
+            print("Connection to switch failed !")
+            return False
+        
 
     def CloseRelay(self, relay_num):
         switch.fnCloseRelay(self.switch_obj, relay_num)
